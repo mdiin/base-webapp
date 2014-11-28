@@ -72,6 +72,10 @@
 (defonce select-album-chan (async/chan))
 (async/sub event-publisher :select-album select-album-chan)
 
+(defn- add-pictures-to-album
+  [pictures album]
+  ())
+
 (defn- select-album-event
   [e]
   (let [album (get e :payload)
@@ -95,18 +99,24 @@
 (defonce remove-from-album-chan (async/chan))
 (async/sub event-publisher :remove-from-album remove-from-album-chan)
 
+(defn- remove-selected-albums-from-picture
+  [picture]
+  (-> picture
+      (update-in [:albums] difference (:selected picture))
+      (assoc :selected #{})))
+
 (defn- remove-selected-pictures-from-album
-  [pictures]
-  (let [selected-pictures (filter (comp seq :selected) pictures)
-        removed-albums (map #(difference (:albums %) (:selected %)) selected-pictures)
+  [pictures-map]
+  (let [pictures (vals pictures-map)
+        selected-pictures (filter (comp seq :selected) pictures)
+        removed-albums (map remove-selected-albums-from-picture selected-pictures)
         removed-albums-as-map (into {} (map #(vector (:id %) %) removed-albums))]
-    (merge pictures removed-albums-as-map)))
+    (merge pictures-map removed-albums-as-map)))
 
 (defn- remove-from-album-event
   [event]
   (let [current-picture-state @(app-state :pictures)
-        current-pictures (vals current-picture-state)
-        removed-albums (remove-selected-pictures-from-album current-pictures)]
+        removed-albums (remove-selected-pictures-from-album current-picture-state)]
     (when (compare-and-set! (app-state :pictures) current-picture-state removed-albums)
       (publish-event :event :pictures-changed :payload (vals @(app-state :pictures))))))
 
