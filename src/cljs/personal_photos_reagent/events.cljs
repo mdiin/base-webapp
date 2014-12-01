@@ -127,6 +127,24 @@
 
 (process-select-album-events)
 
+;; ## View album events
+(defonce view-album-chan (async/chan))
+(async/sub event-publisher :view-album view-album-chan)
+
+(defn- view-album-event
+  [event]
+  (let [album (get event :payload)
+        current-album-state @(app-state :visible-album)]
+    (compare-and-set! (app-state :visible-album) current-album-state album)))
+
+(defn- process-view-album-events []
+  (go
+    (while true
+      (let [event (async/<! view-album-chan)]
+        (view-album-event event)))))
+
+(process-view-album-events)
+
 ;; ## Remove from album events
 
 (defonce remove-from-album-chan (async/chan))

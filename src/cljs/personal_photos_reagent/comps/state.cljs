@@ -5,6 +5,7 @@
 (defonce storage
   {:local-states {}
    :app-states {:mode (atom :browse)
+                :visible-album (atom "No album")
                 :albums (atom {"First" [2]
                                "Second" [1]})
                 :pictures (atom {2 {:full-url "http://placehold.it/300x300"

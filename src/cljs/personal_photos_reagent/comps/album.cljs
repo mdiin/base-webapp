@@ -19,34 +19,39 @@
      [:img {:src (:full-url pic)}]
      [:p (js/Date (:timestamp pic))]]))
 
-(defn album [album-name picture-ids]
+(defn album []
   (let [mode @(app-state :mode)
         pictures @(app-state :pictures)
+        visible-album @(app-state :visible-album)
 
-        album-pictures (map #(get pictures %) picture-ids)]
+        album-picture-ids (get @(app-state :albums) visible-album)
+        album-pictures (map #(get pictures %) album-picture-ids)]
     [:div
-     [:h1 album-name]
+     [:h1 visible-album]
      (for [p album-pictures]
-       ^{:key (:id p)} [picture :pic p :mode mode :album album-name])]))
+       ^{:key (:id p)} [picture :pic p :mode mode :album visible-album])]))
 
 (defn- select-album
   [album]
   (fn [e]
     (publish-event :event :select-album :payload album)))
 
-(defn albums [{:keys [pictures?]}]
+(defn- view-album
+  [album]
+  (fn [e]
+    (publish-event :event :view-album :payload album)))
+
+(defn albums []
   (let [mode @(app-state :mode)
         albums @(app-state :albums)]
-    (if pictures?
-      [:div
-       (for [[album-name picture-ids] albums]
-         ^{:key album-name} [album album-name picture-ids])]
-      [:div
-       [:ol
-        (for [a (keys albums)]
-          ^{:key a} [:li {:on-click (when (= mode :add-to-album)
-                                      (select-album a))}
-                     a])]])))
+    [:div
+     [:h1 "Albums"]
+     [:ol
+      (for [a (keys albums)]
+        ^{:key a} [:li {:on-click (if (= mode :add-to-album)
+                                    (select-album a)
+                                    (view-album a))}
+                   a])]]))
 
 (defonce new-album-local-state (atom ""))
 (defn new-album []
