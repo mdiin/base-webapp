@@ -7,6 +7,7 @@
 
     [taoensso.sente :as sente]
     
+    [personal-photos-reagent.handlers :as handlers]
     [personal-photos-reagent.channel-socket :as channel-socket]
     ))
 
@@ -46,24 +47,8 @@
 
 ;; # ChannelSocketRouter
 
-(defn- logf [fmt & xs] (println (apply format fmt xs)))
-
-(defmulti event-msg-handler :id)
-(defn event-msg-handler* [{:as ev-msg :keys [id ?data event]}]
-  (logf "Event: %s" event)
-  (event-msg-handler ev-msg))
-
-(defmethod event-msg-handler :default ; Fallback
-  [{:as ev-msg :keys  [event id ?data ring-req ?reply-fn send-fn]}]
-  (let  [session  (:session ring-req)
-         uid  (:uid session)]
-    (logf  "Unhandled event: %s" event)
-    (when ?reply-fn
-      (?reply-fn  {:umatched-event-as-echoed-from-from-server event}))))
-
-
 (defn- start-channel-socket-router [ch-recv]
-  (sente/start-chsk-router! ch-recv event-msg-handler*))
+  (sente/start-chsk-router! ch-recv handlers/event-msg-handler*))
 
 (defn- stop-channel-socket-router [router]
   (router))

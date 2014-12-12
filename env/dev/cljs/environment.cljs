@@ -1,7 +1,7 @@
 (ns environment
   (:require
     [figwheel.client :as fw]
-    
+
     [personal-photos-reagent.core :as app-core]))
 
 (enable-console-print!)

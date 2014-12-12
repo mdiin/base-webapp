@@ -28,7 +28,6 @@
   :dev-dependencies [[com.cemerick/piggieback "0.1.3"]]
   
   :main personal-photos-reagent.main
-  :ring {:handler personal-photos-reagent.main/app}
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-figwheel "0.1.7-SNAPSHOT"]]
 
@@ -42,13 +41,12 @@
                         :output-to "resources/public/js/app.js"
                         :output-dir "resources/public/js/out"
                         :source-map "resources/public/js/out.js.map"
-                        ;:optimizations :none
-                        ;:pretty-print true
                         }}}}
 
   :profiles
   {:dev
    {:source-paths ["env/dev/clj"]
+    :resource-paths ["env/dev/resources"]
     :cljsbuild
     {:builds {:app
               {:source-paths ["env/dev/cljs"]
@@ -57,6 +55,7 @@
    
    :production
    {:source-paths ["env/prod/clj"]
+    :resource-paths ["env/prod/resources"]
     :cljsbuild
     {:builds {:app
               {:source-paths ["env/prod/cljs"]
