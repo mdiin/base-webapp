@@ -4,25 +4,49 @@
 
     [compojure.core :as compojure :refer (defroutes GET POST)]
     [compojure.route :as route]
+
+    [ring.util.response :as ring-response]
     [ring.middleware.defaults]
     [ring.middleware.anti-forgery :as ring-anti-forgery]
+
     [org.httpkit.server :as http-kit-server]
+
     [taoensso.sente :as sente]
+
+    [cemerick.friend :as friend]
+    [cemerick.friend.workflows :as workflows]
+    [cemerick.friend.credentials :as credentials]
     
     [personal-photos-reagent.routes :as routes]
     [personal-photos-reagent.channel-socket :as channel-socket]
     
     [environment]))
 
-;(defn- make-ring-handler
-  ;[routes]
-  ;(let [ring-defaults-config (assoc-in ring.middleware.defaults/site-defaults
-                                       ;[:security :anti-forgery]
-                                       ;{:read-token (fn [req] (-> req :params :csrf-token))})]
-    ;(ring.middleware.defaults/wrap-defaults routes ring-defaults-config)))
+(defn- generate-response
+  [body status]
+  (-> (ring-response/response body)
+      (ring-response/status status)))
+
+(def users
+  {"mdiin" {:username "mdiin" :password (creds/hash-bcrypt "mdiin")}})
+
+(def authentication-map
+  {:allow-anon? true
+   :redirect-on-auth? false
+   :login-failure-handler (fn [e] (generate-response {:error "Wrong credentials"} 401))
+   :unauthenticated-handler #(generate-response "unauthenticated" 401)
+   :login-uri "/login"
+   :default-landing-uri "/"
+   :unauthorized-handler #(generate-response "unauthorized" 403)
+   :credential-fn (fn [c] 
+                    (println "Credential: " c)
+                    (creds/bcrypt-credential-fn users c))
+   :workflows [(workflows/interactive-form :redirect-on-auth? false)]
+   })
 
 (defn- start-server! [port routes]
-  (http-kit-server/run-server (environment/make-ring-handler routes) {:port port}))
+  (let [base-handler (friend/authenticate routes authentication-map)]
+    (http-kit-server/run-server (environment/make-ring-handler base-handler) {:port port})))
 
 (defn- stop-server! [server]
   (when server

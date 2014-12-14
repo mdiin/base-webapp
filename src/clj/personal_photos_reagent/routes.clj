@@ -19,7 +19,6 @@
 
       (GET "/chsk" req (ajax-get-or-ws-handshake-fn req))
       (POST "/chsk" req (ajax-post-fn req))
-      (POST "/login" req "<h1>LOGIN</h1>")
 
       (route/resources "/") ; Static files, notably public/main.js (our cljs target)
       (route/not-found "<h1>Page not found</h1>"))))
