@@ -1,7 +1,7 @@
 (ns personal-photos-reagent.comps.user
   (:require
     [personal-photos-reagent.comps.state :as state :refer [app-state]]
-    [personal-photos-reagent.events :as events :refer [publish-event]]))
+    [personal-photos-reagent.events.client :as client]))
 
 (def login-local-state (atom {}))
 
@@ -14,7 +14,7 @@
              assoc field value))))
 
 (defn- submit []
-  (publish-event :event :sign-in
+  (client/publish-event :id client/sign-in
                  :payload {:username (get @login-local-state :username)
                            :password (get @login-local-state :password)}))
 

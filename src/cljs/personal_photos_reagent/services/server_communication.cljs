@@ -24,20 +24,3 @@
 (defn reconnect! []
   (sente/chsk-reconnect! chsk))
 
-(defmulti process-server-event :event)
-
-(defn- process-server-events []
-  (go
-    (while true
-      (let [event (async/<! ch-recv)]
-        (process-server-event event)))))
-(process-server-events)
-
-(defmethod process-server-event :default
-  [event]
-  (.log js/console (str "Unhandled event " event)))
-
-(defmethod process-server-event :sign-in-ack
-  [event]
-  (println "Ack"))
-

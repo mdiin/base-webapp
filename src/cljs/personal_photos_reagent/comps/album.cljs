@@ -2,13 +2,13 @@
   (:require
     [reagent.core :as reagent :refer [atom]]
 
-    [personal-photos-reagent.events :as events :refer [publish-event]]
+    [personal-photos-reagent.events.client :as client]
     [personal-photos-reagent.comps.state :as state :refer [local-state app-state]]))
 
 (defn- select-picture
   [pic album]
   (fn [e]
-    (publish-event :event :select-picture :payload {:picture pic :album album})))
+    (client/publish-event :id client/select-picture :payload {:picture pic :album album})))
 
 (defn picture [& {:keys [pic mode album]}]
   (if (= mode :select)
@@ -34,12 +34,12 @@
 (defn- select-album
   [album]
   (fn [e]
-    (publish-event :event :select-album :payload album)))
+    (client/publish-event :id client/select-album :payload album)))
 
 (defn- view-album
   [album]
   (fn [e]
-    (publish-event :event :view-album :payload album)))
+    (client/publish-event :id client/view-album :payload album)))
 
 (defn albums []
   (let [mode @(app-state :mode)
@@ -73,10 +73,10 @@
   (let [pictures (vals @(app-state :pictures))
         selected-pictures (filter (comp seq :selected) pictures)]
     (when (seq selected-pictures)
-      [:button {:on-click #(publish-event :event :remove-from-album :payload selected-pictures)}
+      [:button {:on-click #(client/publish-event :id client/remove-from-album :payload selected-pictures)}
        "Remove from album"])))
 
 (defn deselect-all-button []
-  [:button {:on-click #(publish-event :event :deselect-pictures)}
+  [:button {:on-click #(client/publish-event :id client/deselect-pictures)}
    "Deselect all"])
 
