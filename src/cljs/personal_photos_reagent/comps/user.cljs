@@ -10,7 +10,6 @@
   (fn [e]
     (let [target (.-target e)
           value (.-value target)]
-      (println @login-local-state)
       (swap! login-local-state
              assoc field value))))
 

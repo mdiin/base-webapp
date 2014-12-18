@@ -219,7 +219,6 @@
                            {:username username :password password}
                            (fn [response]
                              (do
-                               (println response)
                                (server-comm/reconnect!))))))
 
 (defn- process-sign-in-events []

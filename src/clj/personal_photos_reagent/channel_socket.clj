@@ -10,6 +10,12 @@
   (let [{:keys [ch-recv]} socket]
     (async/close! ch-recv)))
 
+(defn- start-channel-socket []
+  (sente/make-channel-socket!
+    {:packer :edn
+     :user-id-fn (fn [ring-req]
+                   (:identity (friend/current-authentication ring-req)))}))
+
 (defrecord ChannelSocket [channel-socket]
   component/Lifecycle
   
@@ -18,8 +24,7 @@
       this
       (do
         (println ";; Starting ChannelSocket")
-        (assoc this :channel-socket (sente/make-channel-socket! {:packer :edn
-                                                                 :user-id-fn (fn [ring-req] (:identity (friend/current-authentication ring-req)))})))))
+        (assoc this :channel-socket (start-channel-socket)))))
   
   (stop [this]
     (if-not channel-socket

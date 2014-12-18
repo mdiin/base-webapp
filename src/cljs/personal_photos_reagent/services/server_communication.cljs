@@ -16,7 +16,6 @@
 (defn send-ajax
   [url method params callback]
   (let [state @state]
-    (.log js/console state)
     (sente/ajax-call url
                      {:method method
                       :params params}

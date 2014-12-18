@@ -8,7 +8,6 @@
     [ring.util.response :as ring-response]
     [ring.middleware.defaults]
     [ring.middleware.session :as ring-session]
-    [ring.middleware.anti-forgery :as csrf]
 
     [org.httpkit.server :as http-kit-server]
 
@@ -40,7 +39,6 @@
    :default-landing-uri "/"
    :unauthorized-handler #(generate-response "unauthorized" 403)
    :credential-fn (fn [c] 
-                    (println "Credential: " c)
                     (credentials/bcrypt-credential-fn users c))
    :workflows [(workflows/interactive-form :redirect-on-auth? false)]
    })
