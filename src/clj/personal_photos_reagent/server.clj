@@ -7,7 +7,8 @@
 
     [ring.util.response :as ring-response]
     [ring.middleware.defaults]
-    [ring.middleware.anti-forgery :as ring-anti-forgery]
+    [ring.middleware.session :as ring-session]
+    [ring.middleware.anti-forgery :as csrf]
 
     [org.httpkit.server :as http-kit-server]
 
@@ -28,7 +29,7 @@
       (ring-response/status status)))
 
 (def users
-  {"mdiin" {:username "mdiin" :password (creds/hash-bcrypt "mdiin")}})
+  {"mdiin" {:username "mdiin" :password (credentials/hash-bcrypt "mdiin")}})
 
 (def authentication-map
   {:allow-anon? true
@@ -40,13 +41,18 @@
    :unauthorized-handler #(generate-response "unauthorized" 403)
    :credential-fn (fn [c] 
                     (println "Credential: " c)
-                    (creds/bcrypt-credential-fn users c))
+                    (credentials/bcrypt-credential-fn users c))
    :workflows [(workflows/interactive-form :redirect-on-auth? false)]
    })
 
+(defn- make-ring-handler
+  [base-handler]
+  (-> base-handler
+      (environment/make-ring-handler)))
+
 (defn- start-server! [port routes]
   (let [base-handler (friend/authenticate routes authentication-map)]
-    (http-kit-server/run-server (environment/make-ring-handler base-handler) {:port port})))
+    (http-kit-server/run-server (make-ring-handler base-handler) {:port port})))
 
 (defn- stop-server! [server]
   (when server

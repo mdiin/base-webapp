@@ -18,6 +18,7 @@
                  [ring "1.3.2"]
                  [ring/ring-defaults "0.1.2"]
                  [compojure "1.3.1"]
+                 [hiccup "1.0.5"]
 
                  ;; Server security
                  [com.cemerick/friend "0.2.1"]

@@ -8,7 +8,7 @@
   [routes]
   (let [ring-defaults-config (assoc-in ring.middleware.defaults/site-defaults
                                        [:security :anti-forgery]
-                                       {:read-token (fn [req] (-> req :params :csrf-token))})]
+                                       false)]
     (-> routes
         (ring.middleware.defaults/wrap-defaults ring-defaults-config)
         (reload/wrap-reload))))

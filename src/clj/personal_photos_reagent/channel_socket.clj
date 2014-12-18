@@ -2,7 +2,8 @@
   (:require
     [clojure.core.async :as async]
     [com.stuartsierra.component :as component]
-    [taoensso.sente :as sente]))
+    [taoensso.sente :as sente]
+    [cemerick.friend :as friend]))
 
 (defn- stop-channel-socket
   [socket]
@@ -17,7 +18,8 @@
       this
       (do
         (println ";; Starting ChannelSocket")
-        (assoc this :channel-socket (sente/make-channel-socket! {:packer :edn})))))
+        (assoc this :channel-socket (sente/make-channel-socket! {:packer :edn
+                                                                 :user-id-fn (fn [ring-req] (:identity (friend/current-authentication ring-req)))})))))
   
   (stop [this]
     (if-not channel-socket

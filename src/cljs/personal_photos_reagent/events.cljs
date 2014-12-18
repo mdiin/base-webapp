@@ -5,6 +5,7 @@
     [cljs.core.async :as async]
     [clojure.set :as s :refer [difference]]
 
+    [personal-photos-reagent.services.server-communication :as server-comm]
     [personal-photos-reagent.comps.state :as state :refer [app-state]]))
 
 ;; # Main entry point to NS
@@ -203,4 +204,47 @@
       (let [event (async/<! mode-change-chan)]
         (mode-change-event event)))))
 (process-mode-change-events)
+
+;; # Sign-in events
+(defonce sign-in-chan (async/chan))
+
+(async/sub event-publisher :sign-in sign-in-chan)
+
+(defn- sign-in-event
+  [event]
+  (let [username (get-in event [:payload :username])
+        password (get-in event [:payload :password])]
+    (server-comm/send-ajax "/login"
+                           :post
+                           {:username username :password password}
+                           (fn [response]
+                             (do
+                               (println response)
+                               (server-comm/reconnect!))))))
+
+(defn- process-sign-in-events []
+  (go
+    (while true
+      (let [event (async/<! sign-in-chan)]
+        (sign-in-event event)))))
+
+(process-sign-in-events)
+
+;; # Read state events
+(defonce read-state-chan (async/chan))
+
+(async/sub event-publisher :read-state read-state-chan)
+
+(defn- read-state-event
+  [event]
+  (let [state @server-comm/state]
+    (.log js/console state)))
+
+(defn- process-read-state-events []
+  (go
+    (while true
+      (let [event (async/<! read-state-chan)]
+        (read-state-event event)))))
+
+(process-read-state-events)
 

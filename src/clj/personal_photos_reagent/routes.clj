@@ -5,7 +5,12 @@
     [compojure.core :as compojure :refer (defroutes GET POST)]
     [compojure.route :as route]
 
+    [hiccup.core :as hiccup]
+    [ring.util.anti-forgery :as csrf]
+    [ring.util.response :as response]
+
     [taoensso.sente :as sente]
+    [cemerick.friend :as friend]
     
     [personal-photos-reagent.handlers :as handlers]
     [personal-photos-reagent.channel-socket :as channel-socket]
@@ -15,7 +20,11 @@
   [channel-socket]
   (let [{:keys [ajax-get-or-ws-handshake-fn ajax-post-fn]} channel-socket]
     (compojure/routes
-      (GET "/" req "<h1>LANDING</h1")
+      (GET "/" req "<h1>LANDING</h1>")
+      (POST "/login" req (let [current-auth (friend/current-authentication req)
+                               session (:session req)]
+                           (println (str "Current auth: " current-auth))
+                           (response/response {:status 200})))
 
       (GET "/chsk" req (ajax-get-or-ws-handshake-fn req))
       (POST "/chsk" req (ajax-post-fn req))

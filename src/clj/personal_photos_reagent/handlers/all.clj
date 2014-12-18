@@ -14,5 +14,5 @@
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
         uid (:uid session)]
-    (logf "app/an-event received: %s" event)))
+    (logf "app/an-event received: %s. %s" event ring-req)))
 
