@@ -13,19 +13,23 @@
 
 ;; # State watchers
 
+(defn load-user-event
+  [uid]
+  (events/publish-server-event
+    :id server-events/user
+    :payload {:uid uid}
+    :?reply-fn (fn [reply]
+                 (println "Got reply: " reply)
+                 (events/publish-client-event
+                   :id client-events/user-changed
+                   :payload reply))))
+
 (defn- state-change-handler
   [key state old-state new-state]
   (let [old-uid (:uid old-state)
         new-uid (:uid new-state)]
     (when-not (= old-uid new-uid)
-      (events/publish-server-event
-        :id server-events/user
-        :payload {:uid new-uid}
-        :?reply-fn (fn [reply]
-                     (println "Got reply: " reply)
-                     (events/publish-client-event
-                       :id client-events/user-changed
-                       :payload reply))))))
+      (load-user-event new-uid))))
 
 (add-watch server-comm/state :uid state-change-handler)
 

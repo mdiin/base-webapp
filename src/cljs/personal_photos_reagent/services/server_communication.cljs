@@ -24,3 +24,6 @@
 (defn reconnect! []
   (sente/chsk-reconnect! chsk))
 
+(defn current-uid []
+  (:uid @state))
+
