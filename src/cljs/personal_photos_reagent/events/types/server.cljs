@@ -8,4 +8,5 @@
 
 (def sign-in :server/sign-in-ack)
 (def user :server/user)
+(def new-user :server/new-user)
 

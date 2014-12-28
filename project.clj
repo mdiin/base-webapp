@@ -29,9 +29,11 @@
                  ;; SQL
                  [yesql "0.4.0"]
                  [org.postgresql/postgresql "9.3-1102-jdbc41"]
+                 [clojure.jdbc/clojure.jdbc-c3p0  "0.3.1"]
 
                  ;; Clojure official tools
                  [org.clojure/tools.logging "0.3.1"]
+                 [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2411"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]

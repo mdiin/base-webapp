@@ -28,10 +28,8 @@
   (-> (ring-response/response body)
       (ring-response/status status)))
 
-(def users
-  {"mdiin" {:username "mdiin" :password (credentials/hash-bcrypt "mdiin")}})
-
-(def authentication-map
+(defn- authentication-map
+  [dbspec]
   {:allow-anon? true
    :redirect-on-auth? false
    :login-failure-handler (fn [e] (generate-response {:error "Wrong credentials"} 401))
@@ -40,7 +38,7 @@
    :default-landing-uri "/"
    :unauthorized-handler #(generate-response "unauthorized" 403)
    :credential-fn (fn [c] 
-                    (credentials/bcrypt-credential-fn data/credential-user-fn c))
+                    (credentials/bcrypt-credential-fn (partial data/credential-user-fn dbspec) c))
    :workflows [(workflows/interactive-form :redirect-on-auth? false)]
    })
 
@@ -49,15 +47,15 @@
   (-> base-handler
       (environment/make-ring-handler)))
 
-(defn- start-server! [port routes]
-  (let [base-handler (friend/authenticate routes authentication-map)]
+(defn- start-server! [port routes dbspec]
+  (let [base-handler (friend/authenticate routes (authentication-map dbspec))]
     (http-kit-server/run-server (make-ring-handler base-handler) {:port port})))
 
 (defn- stop-server! [server]
   (when server
     (server :timeout 100)))
 
-(defrecord Server [port ordinary-router channel-socket-router server]
+(defrecord Server [port ordinary-router channel-socket-router database server]
   component/Lifecycle
   
   (start [this]
@@ -65,7 +63,7 @@
       this
       (do
         (println ";; Starting Server")
-        (assoc this :server (start-server! port (:routes ordinary-router))))))
+        (assoc this :server (start-server! port (:routes ordinary-router) (:dbspec database))))))
   
   (stop [this]
     (if-not server

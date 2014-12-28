@@ -52,13 +52,13 @@
 
 ;; # ChannelSocketRouter
 
-(defn- start-channel-socket-router [ch-recv]
-  (sente/start-chsk-router! ch-recv handlers/event-msg-handler*))
+(defn- start-channel-socket-router [ch-recv dbspec]
+  (sente/start-chsk-router! ch-recv (partial handlers/event-msg-handler* dbspec)))
 
 (defn- stop-channel-socket-router [router]
   (router))
 
-(defrecord ChannelSocketRouter [channel-socket router]
+(defrecord ChannelSocketRouter [channel-socket database router]
   component/Lifecycle
   
   (start [this]
@@ -66,7 +66,7 @@
       this
       (do
         (println ";; Starting ChannelSocketRouter")
-        (assoc this :router (start-channel-socket-router (get-in channel-socket [:channel-socket :ch-recv]))))))
+        (assoc this :router (start-channel-socket-router (get-in channel-socket [:channel-socket :ch-recv]) (:dbspec database))))))
   
   (stop [this]
     (if-not router

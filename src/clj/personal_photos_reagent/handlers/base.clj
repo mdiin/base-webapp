@@ -2,5 +2,5 @@
 
 (defn logf [fmt & xs] (println (apply format fmt xs)))
 
-(defmulti event-msg-handler :id)
+(defmulti event-msg-handler (fn [dbspec event] (:id event)))
 
