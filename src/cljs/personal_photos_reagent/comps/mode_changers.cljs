@@ -2,12 +2,14 @@
   (:require
     [reagent.core :as reagent :refer [atom]]
 
-    [personal-photos-reagent.events.client :as client]
+    [personal-photos-reagent.events :as events]
+    [personal-photos-reagent.events.types.client :as client-events]
+    [personal-photos-reagent.events.types.server :as server-events]
     [personal-photos-reagent.comps.state :as state :refer [app-state]]))
 
 (defn- mode-change-event
   [mode]
-  (client/publish-event :id client/mode-change :payload {:mode mode}))
+  (events/publish-client-event :id client-events/mode-change :payload {:mode mode}))
 
 (defn- toggle-select
   []

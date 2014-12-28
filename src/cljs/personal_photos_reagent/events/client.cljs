@@ -5,26 +5,29 @@
     [cljs.core.async :as async]
     [clojure.set :as s :refer [difference]]
     
+    [personal-photos-reagent.events :as events :refer [client-event]]
+    [personal-photos-reagent.events.types.client :as client-events]
+    [personal-photos-reagent.events.types.server :as server-events]
     [personal-photos-reagent.services.server-communication :as server-comm]
     [personal-photos-reagent.comps.state :as state :refer [app-state]]))
 
-(defonce events (async/chan))
+;; # State watchers
 
-(defn publish-event
-  [& {:keys [id payload] :as event-map}]
-  (async/put! events event-map))
+(defn- state-change-handler
+  [key state old-state new-state]
+  (let [old-uid (:uid old-state)
+        new-uid (:uid new-state)]
+    (when-not (= old-uid new-uid)
+      (events/publish-server-event
+        :id server-events/user
+        :payload {:uid new-uid}
+        :?reply-fn (fn [reply]
+                     (println "Got reply: " reply)
+                     (events/publish-client-event
+                       :id client-events/user-changed
+                       :payload reply))))))
 
-;; ## Handlers
-
-(defmulti client-event :id)
-
-(defn- process-client-events []
-  (go
-    (while true
-      (let [event (async/<! events)]
-        (client-event event)))))
-
-(process-client-events)
+(add-watch server-comm/state :uid state-change-handler)
 
 ;; ### Default handler
 
@@ -41,9 +44,7 @@
       (update-in pictures-state [picture-id :selected] disj album-name)
       (update-in pictures-state [picture-id :selected] conj album-name))))
 
-(def select-picture :client/select-picture)
-
-(defmethod client-event select-picture
+(defmethod client-event client-events/select-picture
   [{:as event :keys [_ payload]}]
   (let [current-pictures-state @(app-state :pictures)
         picture-id-to-select (get-in payload [:picture :id])
@@ -62,9 +63,7 @@
   (into {}
         (map deselect-picture ps)))
 
-(def deselect-pictures :client/deselect-pictures)
-
-(defmethod client-event deselect-pictures
+(defmethod client-event client-events/deselect-pictures
   [_]
   (let [current-pictures-state @(app-state :pictures)
         new-pictures-state (deselect-pictures current-pictures-state)]
@@ -72,9 +71,7 @@
 
 ;; ### Pictures changed
 
-(def pictures-changed :client/pictures-changed)
-
-(defmethod client-event pictures-changed
+(defmethod client-event client-events/pictures-changed
   [_]
   (let [current-picture-state @(app-state :pictures)
         current-album-state @(app-state :albums)
@@ -99,21 +96,17 @@
         with-album-map (into {} (map #(vector (:id %) %) with-album))]
     (merge pictures-map with-album-map)))
 
-(def select-album :client/select-album)
-
-(defmethod client-event select-album
+(defmethod client-event client-events/select-album
   [{:as event :keys [payload]}]
   (let [album payload
         current-picture-state @(app-state :pictures)
         with-new-albums (add-pictures-to-album current-picture-state album)]
     (when (compare-and-set! (app-state :pictures) current-picture-state with-new-albums)
-      (publish-event :id pictures-changed))))
+      (events/publish-client-event :id client-events/pictures-changed))))
 
 ;; ### View album
 
-(def view-album :client/view-album)
-
-(defmethod client-event view-album
+(defmethod client-event client-events/view-album
   [{:as event :keys [payload]}]
   (let [album (get event :payload)
         current-album-state @(app-state :visible-album)]
@@ -134,14 +127,12 @@
         removed-albums-as-map (into {} (map #(vector (:id %) %) removed-albums))]
     (merge pictures-map removed-albums-as-map)))
 
-(def remove-from-album :client/remove-from-album)
-
-(defmethod client-event remove-from-album
+(defmethod client-event client-events/remove-from-album
   [_]
   (let [current-picture-state @(app-state :pictures)
         removed-albums (remove-selected-pictures-from-album current-picture-state)]
     (when (compare-and-set! (app-state :pictures) current-picture-state removed-albums)
-      (publish-event :id pictures-changed))))
+      (events/publish-client-event :id client-events/pictures-changed))))
 
 ;; ### Mode change
 (defn- new-mode
@@ -150,9 +141,7 @@
     nil
     event-mode))
 
-(def mode-change :client/mode-change)
-
-(defmethod client-event mode-change
+(defmethod client-event client-events/mode-change
   [{:as event :keys [payload]}]
   (let [event-mode (get payload :mode)
         current-mode @(app-state :mode)
@@ -161,9 +150,7 @@
 
 ;; ### Sign-in
 
-(def sign-in :client/sign-in)
-
-(defmethod client-event sign-in
+(defmethod client-event client-events/sign-in
   [{:as event :keys [payload]}]
   (let [username (get-in event [:payload :username])
         password (get-in event [:payload :password])]
@@ -174,20 +161,26 @@
                              (do
                                (server-comm/reconnect!))))))
 
+;; ### Sign-out
+
+(defmethod client-event client-events/sign-out
+  [_]
+  (server-comm/send-ajax "/logout"
+                         :get
+                         {}
+                         (fn [response]
+                           (do
+                             (server-comm/reconnect!)))))
+
 ;; ### User changed
 
-(def user-changed :client/user-changed)
-
-(defmethod client-event user-changed
+(defmethod client-event client-events/user-changed
   [{:as event :keys [payload]}]
-  (let [new-user (get payload :uid)]
-    (reset! app-state :current-user new-user)))
+  (reset! (app-state :current-user) payload))
 
 ;; ### Read state
 
-(def read-state :client/read-state)
-
-(defmethod client-event read-state
+(defmethod client-event client-events/read-state
   [_]
   (let [state @server-comm/state]
     (.log js/console state)))

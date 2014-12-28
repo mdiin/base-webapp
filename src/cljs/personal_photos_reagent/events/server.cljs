@@ -4,24 +4,11 @@
   (:require
     [cljs.core.async :as async]
     
+    [personal-photos-reagent.events :as events :refer [server-event]]
+    [personal-photos-reagent.events.types.server :as server-events]
+    [personal-photos-reagent.events.types.client :as client-events]
     [personal-photos-reagent.services.server-communication :as server-comm]
     [personal-photos-reagent.comps.state :as state :refer [app-state]]))
-
-(defn publish-event
-  [& {:keys [id payload] :as event-map}]
-  (server-comm/send-fn [id payload]))
-
-;; ## Handlers
-
-(defmulti server-event :id)
-
-(defn- process-server-events []
-  (go
-    (while true
-      (let [event (async/<! server-comm/ch-recv)]
-        (server-event event)))))
-
-(process-server-events)
 
 ;; ### Default handler
 
@@ -29,11 +16,11 @@
   [event]
   (println (str "Unhandled event " event)))
 
-(defmethod server-event :chsk/state
+(defmethod server-event server-events/state-change
   [_]
   (println "State changed"))
 
-(defmethod server-event :sign-in-ack
+(defmethod server-event server-events/user
   [event]
   (println "Ack"))
 

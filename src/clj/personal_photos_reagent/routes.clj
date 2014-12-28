@@ -2,7 +2,7 @@
   (:require
     [com.stuartsierra.component :as component]
     
-    [compojure.core :as compojure :refer (defroutes GET POST)]
+    [compojure.core :as compojure :refer (defroutes ANY GET POST)]
     [compojure.route :as route]
 
     [ring.util.response :as response]
@@ -23,6 +23,8 @@
 
       (GET "/chsk" req (ajax-get-or-ws-handshake-fn req))
       (POST "/chsk" req (ajax-post-fn req))
+
+      (friend/logout (ANY "/logout" req (response/response {:status 200})))
 
       (route/resources "/") ; Static files, notably public/main.js (our cljs target)
       (route/not-found "<h1>Page not found</h1>"))))

@@ -17,6 +17,7 @@
     [cemerick.friend.workflows :as workflows]
     [cemerick.friend.credentials :as credentials]
     
+    [personal-photos-reagent.data :as data]
     [personal-photos-reagent.routes :as routes]
     [personal-photos-reagent.channel-socket :as channel-socket]
     
@@ -39,7 +40,7 @@
    :default-landing-uri "/"
    :unauthorized-handler #(generate-response "unauthorized" 403)
    :credential-fn (fn [c] 
-                    (credentials/bcrypt-credential-fn users c))
+                    (credentials/bcrypt-credential-fn data/credential-user-fn c))
    :workflows [(workflows/interactive-form :redirect-on-auth? false)]
    })
 
