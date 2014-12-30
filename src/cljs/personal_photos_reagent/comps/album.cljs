@@ -24,9 +24,9 @@
   (let [mode @(app-state :mode)
         pictures @(app-state :pictures)
         visible-album @(app-state :visible-album)
-
-        album-picture-ids (get @(app-state :albums) visible-album)
-        album-pictures (map #(get pictures %) album-picture-ids)]
+        album-pictures (filter (fn [{:keys [albums]}]
+                                 (albums visible-album))
+                               pictures)]
     [:div
      [:h1 visible-album]
      (for [p album-pictures]
