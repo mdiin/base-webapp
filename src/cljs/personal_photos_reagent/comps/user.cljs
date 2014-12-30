@@ -34,7 +34,12 @@
   (events/publish-server-event :id server-events/new-user
                                :payload {:username (get @user-local-state :username)
                                          :password (get @user-local-state :password)
-                                         :name (get @user-local-state :name)}))
+                                         :name (get @user-local-state :name)}
+                               :?reply-fn (fn [user]
+                                            (println "Got reply: " user)
+                                            (events/publish-client-event
+                                              :id client-events/user-changed
+                                              :payload user))))
 
 (defn sign-up []
   [:div

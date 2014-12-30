@@ -15,17 +15,21 @@
   (events/publish-client-event :id client-events/read-state))
 
 (defn main []
-  [:div
-   [user]
-   [:button {:on-click #(server-comm/send-fn [:app/an-event {:data "Foo"}])} "Send event!"]
-   [:button {:on-click foo} "Read state"]
-   [login]
-   [logout]
-   [mode-select-button]
-   [mode-add-to-album-button]
-   [new-album]
-   [remove-from-album]
-   [deselect-all-button]
-   [albums]
-   [album]])
+  (let [current-user @(app-state :current-user)]
+    [:div
+     [user]
+     [:button {:on-click #(server-comm/send-fn [:app/an-event {:data "Foo"}])} "Send event!"]
+     [:button {:on-click foo} "Read state"]
+     (if current-user
+       [:div
+        [mode-select-button]
+        [mode-add-to-album-button]
+        [new-album]
+        [remove-from-album]
+        [deselect-all-button]
+        [albums]
+        [album]]
+       [:div
+        [:h1 "Velkommen!"]
+        [:p "Log ind eller opret dig som bruger."]])]))
 

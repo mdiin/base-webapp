@@ -22,7 +22,21 @@
                  (println "Got reply: " reply)
                  (events/publish-client-event
                    :id client-events/user-changed
-                   :payload reply))))
+                   :payload reply)
+                 (when (seq reply)
+                   (println "Populating state.")
+                   (events/publish-server-event
+                     :id server-events/albums
+                     :?reply-fn (fn [albums]
+                                  (events/publish-client-event
+                                    :id client-events/albums-changed
+                                    :payload albums)))
+                   (events/publish-server-event
+                     :id server-events/pictures
+                     :?reply-fn (fn [pictures]
+                                  (events/publish-client-event
+                                    :id client-events/pictures-changed
+                                    :payload pictures)))))))
 
 (defn- state-change-handler
   [key state old-state new-state]
@@ -107,6 +121,13 @@
         with-new-albums (add-pictures-to-album current-picture-state album)]
     (when (compare-and-set! (app-state :pictures) current-picture-state with-new-albums)
       (events/publish-client-event :id client-events/pictures-changed))))
+
+;; ### Albums changed
+
+(defmethod client-event client-events/albums-changed
+  [{:as event :keys [payload]}]
+  (let [albums payload]
+    (reset! (app-state :albums) albums)))
 
 ;; ### View album
 

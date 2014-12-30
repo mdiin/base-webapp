@@ -50,6 +50,8 @@
 ;; # Queries
 
 (defqueries "personal_photos_reagent/database/user.sql")
+(defqueries "personal_photos_reagent/database/albums.sql")
+(defqueries "personal_photos_reagent/database/pictures.sql")
 
 ;; # Functions
 

@@ -1,5 +1,6 @@
 (ns personal-photos-reagent.handlers.all
   (:require
+    [cemerick.friend :as friend]
     [cemerick.friend.credentials :as credentials]
     [personal-photos-reagent.data :as data]
     [personal-photos-reagent.handlers.base :refer (logf event-msg-handler)]))
@@ -41,4 +42,20 @@
       (when ?reply-fn
         (println (str "WRONG"))
         (?reply-fn "Could not validate username, password, or name.")))))
+
+(defmethod event-msg-handler :server/albums
+  [dbspec {:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+  (if-let [uid (:identity (friend/current-authentication ring-req))]
+    (when ?reply-fn
+      (?reply-fn (data/albums dbspec uid)))
+    (when ?reply-fn
+      (?reply-fn "Not allowed"))))
+
+(defmethod event-msg-handler :server/pictures
+  [dbspec {:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+  (if-let [uid (:identity (friend/current-authentication ring-req))]
+    (when ?reply-fn
+      (?reply-fn (data/pictures dbspec uid)))
+    (when ?reply-fn
+      (?reply-fn "Not allowed"))))
 

@@ -7,20 +7,23 @@
    :app-states {:mode (atom :browse)
                 :visible-album (atom "No album")
                 :current-user (atom nil)
-                :albums (atom {"First" [2]
-                               "Second" [1]})
-                :pictures (atom {2 {:full-url "http://placehold.it/300x300"
-                                    :thumb-url "http://placehold.it/50x50"
-                                    :timestamp (.now js/Date)
-                                    :albums #{"First"}
-                                    :selected #{}
-                                    :id 2}
-                                 1 {:full-url "http://placehold.it/300x300"
-                                    :thumb-url "http://placehold.it/50x50"
-                                    :timestamp (.now js/Date)
-                                    :albums #{"Second"}
-                                    :selected #{}
-                                    :id 1}})}})
+                :albums (atom nil)
+                :pictures (atom nil)
+                ;:albums (atom {"First" [2]
+                               ;"Second" [1]})
+                ;:pictures (atom {2 {:full-url "http://placehold.it/300x300"
+                                    ;:thumb-url "http://placehold.it/50x50"
+                                    ;:timestamp (.now js/Date)
+                                    ;:albums #{"First"}
+                                    ;:selected #{}
+                                    ;:id 2}
+                                 ;1 {:full-url "http://placehold.it/300x300"
+                                    ;:thumb-url "http://placehold.it/50x50"
+                                    ;:timestamp (.now js/Date)
+                                    ;:albums #{"Second"}
+                                    ;:selected #{}
+                                    ;:id 1}})
+                }})
 
 (defn insert-local-state
   [component state]
