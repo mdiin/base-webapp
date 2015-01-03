@@ -6,6 +6,8 @@
     [personal-photos-reagent.events.types.client :as client-events]
     [personal-photos-reagent.events.types.server :as server-events]
     [personal-photos-reagent.services.server-communication :as server-comm]
+
+    [personal-photos-reagent.comps.picture :refer [upload]]
     [personal-photos-reagent.comps.mode-changers :refer [mode-select-button mode-add-to-album-button]]
     [personal-photos-reagent.comps.album :refer [album albums new-album remove-from-album deselect-all-button]]
     [personal-photos-reagent.comps.user :refer [user login logout]]
@@ -28,7 +30,8 @@
         [remove-from-album]
         [deselect-all-button]
         [albums]
-        [album]]
+        [album]
+        [upload]]
        [:div
         [:h1 "Velkommen!"]
         [:p "Log ind eller opret dig som bruger."]])]))

@@ -2,6 +2,10 @@
   (:require
     [cemerick.friend :as friend]
     [cemerick.friend.credentials :as credentials]
+
+    [clj-time.format :as f]
+    [clj-time.coerce :as c]
+
     [personal-photos-reagent.data :as data]
     [personal-photos-reagent.handlers.base :refer (logf event-msg-handler)]))
 
@@ -9,7 +13,7 @@
   [dbspec {:as ev-msg :keys  [event id ?data ring-req ?reply-fn send-fn]}]
   (let  [session  (:session ring-req)
          uid  (:uid session)]
-    (logf  "Unhandled event: %s" event)
+    (logf  "Unhandled event: %s" id)
     (when ?reply-fn
       (?reply-fn  {:umatched-event-as-echoed-from-from-server event}))))
 
@@ -55,7 +59,17 @@
   [dbspec {:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (if-let [uid (:identity (friend/current-authentication ring-req))]
     (when ?reply-fn
-      (?reply-fn (data/pictures dbspec uid)))
+      (?reply-fn (data/pictures* dbspec uid)))
     (when ?reply-fn
       (?reply-fn "Not allowed"))))
+
+(def custom-formatter (f/formatter "yyyy:MM:dd HH:mm:ss"))
+
+(defmethod event-msg-handler :server/upload-picture
+  [dbspec {:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+  (data/new-picture*
+    dbspec
+    (:identity (friend/current-authentication ring-req))
+    (second (second ?data))
+    (c/to-sql-date (f/parse custom-formatter (second (first ?data))))))
 

@@ -11,4 +11,5 @@
 (def new-user :server/new-user)
 (def albums :server/albums)
 (def pictures :server/pictures)
+(def upload-picture :server/upload-picture)
 

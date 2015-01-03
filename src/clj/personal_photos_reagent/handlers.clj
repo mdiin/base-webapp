@@ -4,6 +4,6 @@
     [personal-photos-reagent.handlers.all]))
 
 (defn event-msg-handler* [dbspec {:as ev-msg :keys [id ?data event]}]
-  (base-handler/logf "Event: %s" event)
+  (base-handler/logf "Event: %s" id)
   (base-handler/event-msg-handler dbspec ev-msg))
 
