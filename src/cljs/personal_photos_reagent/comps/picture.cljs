@@ -5,6 +5,8 @@
     [cljs.core.async :as async]
     
     [personal-photos-reagent.events :as events]
+    [personal-photos-reagent.comps.state :as state :refer [app-state]]
+    [personal-photos-reagent.services.server-communication :as server-comm]
     [personal-photos-reagent.events.types.server :as server-events])
   (:require-macros
     [cljs.core.async.macros :as async-macros :refer [go]])
@@ -42,8 +44,11 @@
     (doseq [file @upload-local-state]
       (.postMessage worker (:file file))
       (events/publish-server-event
-        :id server-events/upload-picture
-        :payload (async/<! worker-chan)))))
+          :id server-events/upload-url
+          :payload (async/<! worker-chan)
+          :?reply-fn (fn [url]
+                       (println "POST URL: " url)))
+      (swap! upload-local-state disj file))))
 
 (defn file-preview
   [{:keys [file progress]}]

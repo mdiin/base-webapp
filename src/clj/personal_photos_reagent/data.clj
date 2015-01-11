@@ -77,6 +77,13 @@
          ps-meta)))
 
 (defn new-picture*
+  [dbspec uid date]
+  (try
+    (new-picture<! dbspec uid date)
+    (catch Exception e
+      (println "Exception happened..." (.getMessage e)))))
+
+(defn new-picture-dev*
   [dbspec uid data-url date]
   (try
     (let [{:keys [id]} (new-picture<! dbspec uid date)]

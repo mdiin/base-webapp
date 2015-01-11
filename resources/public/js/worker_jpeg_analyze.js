@@ -18,8 +18,7 @@
 
         var dataURL = reader.readAsDataURL(e.data);
         var o = {
-            metadata: extractMetadata(atob(dataURL.replace(/^.*?,/,''))),
-            dataURL: dataURL
+            metadata: extractMetadata(atob(dataURL.replace(/^.*?,/,'')))
         };
 
         self.postMessage(o);

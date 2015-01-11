@@ -12,4 +12,5 @@
 (def albums :server/albums)
 (def pictures :server/pictures)
 (def upload-picture :server/upload-picture)
+(def upload-url :server/upload-url)
 
