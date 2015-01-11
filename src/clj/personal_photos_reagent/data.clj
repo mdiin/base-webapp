@@ -70,8 +70,10 @@
 (defn pictures*
   [dbspec uid]
   (let [ps-meta (pictures dbspec uid)]
+    (println ps-meta)
     (map (fn [{:as p :keys [id]}]
-           (into p {:dataURL (get @picture-data id)}))
+           (into p {:dataURL (get @picture-data id)
+                    :albums (into #{} (albums-for-picture dbspec id))}))
          ps-meta)))
 
 (defn new-picture*

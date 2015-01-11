@@ -51,7 +51,7 @@
   [dbspec {:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (if-let [uid (:identity (friend/current-authentication ring-req))]
     (when ?reply-fn
-      (?reply-fn (data/albums dbspec uid)))
+      (?reply-fn (data/albums-for-user dbspec uid)))
     (when ?reply-fn
       (?reply-fn "Not allowed"))))
 

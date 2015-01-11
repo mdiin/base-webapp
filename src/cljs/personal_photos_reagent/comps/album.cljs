@@ -14,18 +14,20 @@
 (defn picture [& {:keys [pic mode album]}]
   (if (= mode :select)
     [:div {:on-click (select-picture pic album)}
-     [:img {:src (:full-url pic)}]
-     [:p (js/Date (:timestamp pic))]]
+     [:img {:src (:dataURL pic)}]
+     [:p (str (:created pic))]]
     [:div
-     [:img {:src (:full-url pic)}]
-     [:p (js/Date (:timestamp pic))]]))
+     [:img {:src (:dataURL pic)}]
+     [:p (str (:created pic))]]))
 
 (defn album []
   (let [mode @(app-state :mode)
         pictures @(app-state :pictures)
         visible-album @(app-state :visible-album)
         album-pictures (filter (fn [{:keys [albums]}]
-                                 (albums visible-album))
+                                 (if (= visible-album "No album")
+                                   (not (seq albums))
+                                   (albums visible-album)))
                                pictures)]
     [:div
      [:h1 visible-album]
@@ -71,7 +73,7 @@
           "Add"]]))))
 
 (defn remove-from-album []
-  (let [pictures (vals @(app-state :pictures))
+  (let [pictures @(app-state :pictures)
         selected-pictures (filter (comp seq :selected) pictures)]
     (when (seq selected-pictures)
       [:button {:on-click #(events/publish-client-event :id client-events/remove-from-album :payload selected-pictures)}

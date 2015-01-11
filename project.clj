@@ -16,7 +16,7 @@
                  ;; Server base
                  [http-kit "2.1.19"]
                  [ring "1.3.2"]
-                 [ring/ring-defaults "0.1.2"]
+                 [ring/ring-defaults "0.1.3"]
                  [compojure "1.3.1"]
                  [hiccup "1.0.5"]
 
@@ -35,7 +35,7 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2411"]
+                 [org.clojure/clojurescript "0.0-2511"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
 
                  ;; Client UI
