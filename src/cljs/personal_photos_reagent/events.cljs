@@ -39,7 +39,7 @@
 (defmulti server-event :id)
 (defn- server-event*
   [event]
-  (println (str "Event: " event))
+  (println (str "Event: " (:id event)))
   (server-event event))
 
 (defn- process-server-events []

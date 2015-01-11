@@ -14,7 +14,7 @@
     [personal-photos-reagent.comps.state :refer [app-state]]))
 
 (defn- foo [e]
-  (events/publish-client-event :id client-events/read-state))
+  (.log js/console @server-comm/state))
 
 (defn main []
   (let [current-user @(app-state :current-user)]

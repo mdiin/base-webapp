@@ -28,30 +28,6 @@
   [e]
   (println "Over drop zone..."))
 
-(defn- file-event-handler
-  [file picture-reader]
-  (fn [e]
-    (let [image-data (.. e -target -result)]
-      (events/publish-server-event
-        :id server-events/picture-info
-        :payload (js->clj (goog.crypt.stringToByteArray image-data))
-        :?reply-fn (fn [picture-data]
-                     (set! (.-onloadend picture-reader) (fn [e]
-                                                          (let [picture (.. e -target -result)
-                                                                final-picture (merge picture-data {:picture picture})]
-                                                            (events/publish-server-event
-                                                              :id server-events/upload-picture
-                                                              :payload picture-data)))))))))
-
-(defn- upload-files-2 [_]
-  (println "Uploading " @upload-local-state)
-  (let [picture-reader (js/FileReader.)
-        picture-info-reader (js/FileReader.)]
-    (doseq [file @upload-local-state]
-      (let [exif-part (.slice (:file file) 0 131072)]
-        (set! (.-onloadend picture-info-reader) (file-event-handler file picture-reader))
-        (.readAsBinaryString picture-info-reader exif-part)))))
-
 (def worker-chan (async/chan 1))
 (def worker (js/Worker. "/js/worker_jpeg_analyze.js"))
 (defn- add-worker-listener [w]
@@ -62,9 +38,9 @@
 
 (defn- upload-files [_]
   (println "Uploading " @upload-local-state)
-  (doseq [file @upload-local-state]
-    (.postMessage worker (:file file))
-    (go
+  (go
+    (doseq [file @upload-local-state]
+      (.postMessage worker (:file file))
       (events/publish-server-event
         :id server-events/upload-picture
         :payload (async/<! worker-chan)))))

@@ -2,6 +2,7 @@
   (:require
     [personal-photos-reagent.comps.state :as state :refer [app-state]]
     [personal-photos-reagent.events :as events]
+    [personal-photos-reagent.services.server-communication :as server-comm]
     [personal-photos-reagent.events.types.client :as client-events]
     [personal-photos-reagent.events.types.server :as server-events]))
 
@@ -16,9 +17,13 @@
              assoc field value))))
 
 (defn- submit []
-  (events/publish-client-event :id client-events/sign-in
-                 :payload {:username (get @user-local-state :username)
-                           :password (get @user-local-state :password)}))
+  (server-comm/send-ajax
+    "/login"
+    :post
+    {:username (get @user-local-state :username)
+     :password (get @user-local-state :password)}
+    (fn [response]
+      (server-comm/reconnect!))))
 
 (defn login []
   (let [current-user @(app-state :current-user)]
@@ -37,9 +42,7 @@
                                          :name (get @user-local-state :name)}
                                :?reply-fn (fn [user]
                                             (println "Got reply: " user)
-                                            (events/publish-client-event
-                                              :id client-events/user-changed
-                                              :payload user))))
+                                            (reset! (app-state :current-user) user))))
 
 (defn sign-up []
   [:div
@@ -50,7 +53,13 @@
     "Sign up!"]])
 
 (defn- submit-logout []
-  (events/publish-client-event :id client-events/sign-out))
+  (server-comm/send-ajax
+    "/logout"
+    :get
+    {}
+    (fn [_]
+      (reset! (app-state :current-user) nil)
+      (server-comm/reconnect!))))
 
 (defn logout []
   (let [current-user @(app-state :current-user)]

@@ -9,7 +9,7 @@
 
 (defn- mode-change-event
   [mode]
-  (events/publish-client-event :id client-events/mode-change :payload {:mode mode}))
+  (reset! (app-state :mode) mode))
 
 (defn- toggle-select
   []
@@ -27,7 +27,7 @@
 
 (defn mode-add-to-album-button []
   (let [pictures @(app-state :pictures)
-        selected-pictures (filter (comp seq :selected) (vals pictures))]
+        selected-pictures (filter (comp seq :selected) pictures)]
     (when (seq selected-pictures)
       [:button {:on-click toggle-add-to-album} "Add to album"])))
 
