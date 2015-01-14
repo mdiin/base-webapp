@@ -20,11 +20,14 @@
                  [compojure "1.3.1"]
                  [hiccup "1.0.5"]
 
+                 ;; AWS S3
+                 [clj-aws-s3 "0.3.10"]
+
                  ;; Server security
                  [com.cemerick/friend "0.2.1"]
 
                  ;; Time
-                 [clj-time "0.8.0"]
+                 [clj-time "0.9.0"]
 
                  ;; SQL
                  [yesql "0.4.0"]
@@ -35,7 +38,7 @@
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.cli "0.3.1"]
                  [org.clojure/clojure "1.6.0"]
-                 [org.clojure/clojurescript "0.0-2511"]
+                 [org.clojure/clojurescript "0.0-2665"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
 
                  ;; Client UI
@@ -70,7 +73,9 @@
   {:dev
    {:source-paths ["env/dev/clj"]
     :resource-paths ["env/dev/resources"]
-    :dependencies [[ragtime  "0.3.8"]]
+    :dependencies [[ragtime  "0.3.8"]
+                   [org.clojure/tools.nrepl "0.2.7"]
+                   [spyscope "0.1.5"]]
     :ragtime  {:migrations ragtime.sql.files/migrations
                :database  "jdbc:postgresql://localhost:5432/development?user=development&password=development"}
     :cljsbuild
