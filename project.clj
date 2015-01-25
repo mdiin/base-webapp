@@ -55,7 +55,7 @@
   :main personal-photos-reagent.main
   :plugins [[lein-cljsbuild "1.0.3"]
             [lein-figwheel "0.1.7-SNAPSHOT"]
-            [ragtime/ragtime.lein "0.3.8"]]
+            ]
 
   :hooks [leiningen.cljsbuild]
 
@@ -73,11 +73,8 @@
   {:dev
    {:source-paths ["env/dev/clj"]
     :resource-paths ["env/dev/resources"]
-    :dependencies [[ragtime  "0.3.8"]
-                   [org.clojure/tools.nrepl "0.2.7"]
+    :dependencies [[org.clojure/tools.nrepl "0.2.7"]
                    [spyscope "0.1.5"]]
-    :ragtime  {:migrations ragtime.sql.files/migrations
-               :database  "jdbc:postgresql://localhost:5432/development?user=development&password=development"}
     :cljsbuild
     {:builds {:app
               {:source-paths ["env/dev/cljs"]
