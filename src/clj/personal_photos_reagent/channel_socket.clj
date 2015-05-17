@@ -3,6 +3,7 @@
     [clojure.core.async :as async]
     [com.stuartsierra.component :as component]
     [taoensso.sente :as sente]
+    [taoensso.sente.server-adapters.http-kit]
     [cemerick.friend :as friend]))
 
 (defn- stop-channel-socket
@@ -12,6 +13,7 @@
 
 (defn- start-channel-socket []
   (sente/make-channel-socket!
+    taoensso.sente.server-adapters.http-kit/http-kit-adapter
     {:packer :edn
      :user-id-fn (fn [ring-req]
                    (:identity (friend/current-authentication ring-req)))}))

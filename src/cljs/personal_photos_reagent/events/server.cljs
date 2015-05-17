@@ -14,7 +14,7 @@
 
 (defmethod server-event :default
   [event]
-  (println (str "Unhandled event " event)))
+  (println (str "Unhandled event " (:id event))))
 
 (defmethod server-event server-events/state-change
   [_]

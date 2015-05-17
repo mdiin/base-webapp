@@ -21,26 +21,16 @@
       :payload {:uid uid}
       :?reply-fn (fn [user]
                    (println "Got reply: " user)
-                   (reset! (app-state :current-user) user)
-
-                   (when (seq user)
-                     (println "Populating state.")
-                     (events/publish-server-event
-                       :id server-events/albums
-                       :?reply-fn (fn [albums]
-                                    (println "Albums: " albums)
-                                    (reset! (app-state :albums) albums)))
-                     (events/publish-server-event
-                       :id server-events/pictures
-                       :?reply-fn (fn [pictures]
-                                    (println "Pictures: " pictures)
-                                    (reset! (app-state :pictures) pictures))))))))
+                   (reset! (app-state :current-user) user)))))
 
 (defn- state-change-handler
   [key state old-state new-state]
   (let [old-uid (:uid old-state)
         new-uid (:uid new-state)]
-    (when-not (= old-uid new-uid)
+    (println new-uid)
+    (when-not (or
+                (= old-uid new-uid)
+                (= new-uid :taoensso.sente/nil-uid))
       (if new-uid
         (load-user-event new-uid)
         (reset! (app-state :current-user) nil)))))

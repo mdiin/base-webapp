@@ -15,11 +15,14 @@
 (declare stop)
 (defn start
   []
-  (alter-var-root #'app (constantly (app/system {:database "development"
-                                                 :host "localhost"
-                                                 :port 5432
-                                                 :user "development"
-                                                 :pass "development"})))
+  (alter-var-root #'app (constantly (app/system {:db-name "development"
+                                                 :db-host "localhost"
+                                                 :db-port 5432
+                                                 :db-user "development"
+                                                 :db-pass "development"
+                                                 :s3-bucket "mdiin-pictures"
+                                                 :s3-key "AKIAIEYQQXE6VORYPFOQ"
+                                                 :s3-secret "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"})))
   (alter-var-root #'app component/start))
 
 (defn stop
