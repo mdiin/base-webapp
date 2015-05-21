@@ -3,8 +3,6 @@
     [reagent.core :as reagent :refer [atom]]
 
     [personal-photos-reagent.events :as events]
-    [personal-photos-reagent.events.types.client :as client-events]
-    [personal-photos-reagent.events.types.server :as server-events]
     [personal-photos-reagent.services.server-communication :as server-comm]
 
     [personal-photos-reagent.comps.user :refer [user login logout]]

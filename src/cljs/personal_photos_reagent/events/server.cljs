@@ -5,8 +5,7 @@
     [cljs.core.async :as async]
     
     [personal-photos-reagent.events :as events :refer [server-event]]
-    [personal-photos-reagent.events.types.server :as server-events]
-    [personal-photos-reagent.events.types.client :as client-events]
+    [personal-photos-reagent.events.types :as event-types]
     [personal-photos-reagent.services.server-communication :as server-comm]
     [personal-photos-reagent.comps.state :as state :refer [app-state]]))
 
@@ -16,11 +15,11 @@
   [event]
   (println (str "Unhandled event " (:id event))))
 
-(defmethod server-event server-events/state-change
+(defmethod server-event event-types/state-change
   [_]
   (println "State changed"))
 
-(defmethod server-event server-events/user
+(defmethod server-event event-types/user
   [event]
   (println "Ack"))
 

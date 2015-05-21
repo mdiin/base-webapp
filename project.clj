@@ -7,7 +7,7 @@
 
   :min-lein-version "2.3.4"
 
-  :source-paths ["src/clj" "src/cljs"]
+  :source-paths ["src/clj" "src/cljs" "src/cljc"]
   :resource-paths ["resources"]
 
   :dependencies [;; Components
@@ -34,7 +34,7 @@
                  ;; Clojure official tools
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.cli "0.3.1"]
-                 [org.clojure/clojure "1.7.0-beta3"]
+                 [org.clojure/clojure "1.7.0-RC1"]
                  [org.clojure/clojurescript "0.0-3269"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
 

@@ -7,6 +7,7 @@
     [clj-time.format :as f]
     [clj-time.coerce :as c]
 
+    [personal-photos-reagent.events.types :as event-types]
     [personal-photos-reagent.data :as data]
     [personal-photos-reagent.handlers.base :refer (logf event-msg-handler)]))
 
@@ -18,14 +19,14 @@
     (when ?reply-fn
       (?reply-fn  {:umatched-event-as-echoed-from-from-server event}))))
 
-(defmethod event-msg-handler :server/user
+(defmethod event-msg-handler event-types/user
   [dbspec {:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [uid (:uid ?data)]
     (when ?reply-fn
       (?reply-fn
         (data/user dbspec uid)))))
 
-(defmethod event-msg-handler :server/new-user
+(defmethod event-msg-handler event-types/new-user
   [dbspec {:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [uid (:username ?data)
         password (:password ?data)

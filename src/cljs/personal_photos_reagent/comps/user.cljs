@@ -1,10 +1,9 @@
 (ns personal-photos-reagent.comps.user
   (:require
+    [personal-photos-reagent.events.types :as event-types]
     [personal-photos-reagent.comps.state :as state :refer [app-state]]
     [personal-photos-reagent.events :as events]
-    [personal-photos-reagent.services.server-communication :as server-comm]
-    [personal-photos-reagent.events.types.client :as client-events]
-    [personal-photos-reagent.events.types.server :as server-events]))
+    [personal-photos-reagent.services.server-communication :as server-comm]))
 
 (def user-local-state (atom {}))
 
@@ -36,7 +35,7 @@
         "Log in"]])))
 
 (defn- sign-up-submit []
-  (events/publish-server-event :id server-events/new-user
+  (events/publish-server-event :id event-types/new-user
                                :payload {:username (get @user-local-state :username)
                                          :password (get @user-local-state :password)
                                          :name (get @user-local-state :name)}
